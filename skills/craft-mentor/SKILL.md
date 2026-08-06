@@ -1,6 +1,6 @@
 ---
 name: craft-mentor
-description: General working-craft handoff for any agent session picking up work in a repo — how to problem-solve, what to look for, how to verify, and how to go beyond the literal ask, grounded in documented incidents from production repos. Read at session start, on "handoff", "mentor doc", or before starting substantial work in an unfamiliar codebase. Companions: opus5-mentor (Opus 5 review/stance/reasoning discipline), build-mentor (safe implementation).
+description: General working-craft handoff for any agent session picking up work in a repo — how to problem-solve, what to look for, how to verify, and how to go beyond the literal ask, grounded in documented incidents from production repos. Read at session start, on "handoff", "mentor doc", or before starting substantial work in an unfamiliar codebase. Companions: opus5-mentor (Opus 5 review/stance/reasoning discipline), build-mentor (safe implementation). Model- and agent-agnostic — plain markdown; non-Claude agents (Codex, Cursor, etc.) can read this file directly, e.g. via an AGENTS.md pointer.
 ---
 
 # Craft mentor — how to work a codebase well

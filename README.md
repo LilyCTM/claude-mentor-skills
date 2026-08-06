@@ -16,6 +16,8 @@ Every rule here is anchored to a **real, documented incident** from production r
 
 `opus5-mentor` is designed specifically around recurring Opus 5 pain points documented in the evidence base; it is also useful when another model displays similar behaviour (the evidence base includes exactly such an incident from a different Claude model).
 
+`craft-mentor` and `build-mentor` are **model- and agent-agnostic**: plain markdown that any coding agent can follow — Claude Code, Codex, Cursor, or anything else that reads instructions from the repo. In our use, Codex picks up the craft skill through an `AGENTS.md` pointer and follows it religiously. Only `opus5-mentor` is model-targeted.
+
 They are split because they need different triggers to fire at all: a session that is *building* never hits "review this plan". The most severe session reviewed while developing these skills — two data-loss criticals shipped inside a feature marketed as a safety mechanism, three fabricated changelog entries — would not have invoked a review-shaped skill even once.
 
 ## Install
@@ -31,6 +33,8 @@ your-repo/.claude/skills/opus5-mentor/SKILL.md
 **Claude Code, all projects:** copy them into `~/.claude/skills/` instead.
 
 Claude Code discovers skills placed in the project or user skills directory. Start a new session if a newly added skill does not appear immediately. Invoke manually with `/craft-mentor`, `/build-mentor`, `/opus5-mentor` — or let the trigger descriptions fire them automatically.
+
+**Other agents (Codex, Cursor, etc.):** the skill files are plain markdown — no Claude Code machinery required. Point the agent at them however it discovers instructions. For Codex, add a line to your repo's `AGENTS.md` telling it to read `craft-mentor/SKILL.md` at session start and `build-mentor/SKILL.md` before implementation work.
 
 **claude.ai (chat):** each skill ends with a portable block — paste it into project instructions or a style. You lose the tool-enforced parts but keep the behavioural rules.
 
