@@ -1,6 +1,6 @@
 ---
 name: build-mentor
-description: Build discipline for agent sessions that WRITE code — the failure modes no review-shaped skill catches, because nothing is being reviewed. Counters unverified dependency layers, invented mechanisms the platform already provides, mocks that inherit your misunderstanding, verification that destroys what it checks, fabricated fix provenance, and false doc absolutes. Read BEFORE implementing anything: "implement", "build", "add a feature/helper/probe", "fix this bug", "write tests", editing a changelog/FAQ/README about behaviour, or touching any path that can destroy user data. Companion to opus-mentor (review/stance) and mentor (general craft).
+description: Build discipline for agent sessions that WRITE code — the failure modes no review-shaped skill catches, because nothing is being reviewed. Counters unverified dependency layers, invented mechanisms the platform already provides, mocks that inherit your misunderstanding, verification that destroys what it checks, fabricated fix provenance, and false doc absolutes. Read BEFORE implementing anything: "implement", "build", "add a feature/helper/probe", "fix this bug", "write tests", editing a changelog/FAQ/README about behaviour, or touching any path that can destroy user data. Companion to opus5-mentor (review/stance/reasoning discipline) and craft-mentor (general craft).
 ---
 
 # Build mentor — the layer beneath the one you wrote
@@ -11,7 +11,7 @@ The evidence base is one documented session: ~30 files modified in a small acces
 
 ## 1. Verify the layer beneath the one you wrote
 
-The session's own phrase, and its sharpest rule. Three criticals, one mechanism:
+A phrase from the reviewed session itself, and its sharpest rule. Three criticals, one mechanism:
 
 - A clipboard "safety" probe was built on `pyperclip` without reading what `copy()` does at the Win32 layer. It calls `EmptyClipboard()` unconditionally and writes only plain text; `paste()` returns `''` for an image, copied files, or rich text — indistinguishable from empty. So the probe *destroyed every non-text clipboard it was built to protect*, silently, on every run.
 - A text-replacement step verified delivered text by building a selection with N separate `SendInput` calls — assumed atomic. Win32 guarantees non-interleaving only *within one call*. A user keystroke landing mid-selection replaced the user's own document text — before the verify step ever ran.
@@ -23,7 +23,7 @@ Your logic being sound is the layer you wrote. The dependency, the platform API,
 
 The clipboard probe wrote a sentinel value to detect changes — contaminating clipboard history, destroying formats, requiring a restore path. A decades-old **read-only** Win32 API (`GetClipboardSequenceNumber`) detects clipboard changes without writing anything: no sentinel, no restore, nothing to go wrong. The invented mechanism was strictly worse than the primitive, and its side-effects had been documented as "unavoidable". They were avoidable — by deletion.
 
-Search for the native/stdlib/platform primitive FIRST — mandatory before building anything you'd call a safety mechanism. The platform team already met your edge cases; you're meeting them for the first time.
+Search for the native/stdlib/platform primitive FIRST — mandatory before building anything you'd call a safety mechanism. The platform may already provide a primitive designed around edge cases a new mechanism has not yet encountered.
 
 ## 3. A mock built from your model of the thing proves consistency, not correctness
 
@@ -60,7 +60,7 @@ Fire an independent cold-context audit when any of these is true, regardless of 
 - The session's uncommitted diff has grown past a handful of files. (Also: don't let it. Land coherent, reviewable slices as you go — a 30-file working set has no reviewable diff and rots together on interruption.)
 - You wrote docs asserting runtime behaviour (§6).
 
-This is discipline, not the collapse move opus-mentor §6 bans: collapse reaches for another model to escape an argument it's losing; escalation fires on a trigger registered before any dispute existed.
+This is discipline, not the collapse move opus5-mentor §6 bans: collapse reaches for another model to escape an argument it's losing; escalation fires on a trigger registered before any dispute existed.
 
 ## 8. Self-check before claiming build work is done
 

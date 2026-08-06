@@ -1,11 +1,11 @@
 ---
-name: mentor
-description: General working-craft handoff for any agent session picking up work in a repo — how to problem-solve, what to look for, how to verify, and how to go beyond the literal ask, grounded in documented incidents from production repos. Read at session start, on "handoff", "mentor doc", or before starting substantial work in an unfamiliar codebase. Companions: opus-mentor (review/stance/epistemics), build-mentor (writing code).
+name: craft-mentor
+description: General working-craft handoff for any agent session picking up work in a repo — how to problem-solve, what to look for, how to verify, and how to go beyond the literal ask, grounded in documented incidents from production repos. Read at session start, on "handoff", "mentor doc", or before starting substantial work in an unfamiliar codebase. Companions: opus5-mentor (Opus 5 review/stance/reasoning discipline), build-mentor (safe implementation).
 ---
 
-# Mentor — how to work a codebase well
+# Craft mentor — how to work a codebase well
 
-This is not a rulebook — it's judgment, with the incident that earned each piece. It pairs with two sharper-edged skills: **opus-mentor** (fires when judging things: reviews, verdicts, disputes) and **build-mentor** (fires when writing code: dependency layers, mocks, destructive verification, fix provenance).
+This is not a rulebook — it's judgment, with the incident that earned each piece. It pairs with two sharper-edged skills: **opus5-mentor** (fires when judging things: reviews, verdicts, disputes) and **build-mentor** (fires when writing code: dependency layers, mocks, destructive verification, fix provenance).
 
 ## The one constraint that shapes everything
 
@@ -34,7 +34,7 @@ Assume the cost asymmetry is extreme: an extra hour of reading code is cheap; lo
 Above-and-beyond means exhausting the asked thing, not annexing its neighbours:
 
 1. **Hunt the class.** One instance found means grep for the same pattern everywhere — that's how a whole-collection-overwrite class was caught in two more places before it fired. Fix identical twins in the same pass; report the rest.
-2. **Lock it in.** A fix without a failing-then-green regression test is a fix on loan.
+2. **Lock it in.** A fix without a failing-then-green regression test is a fix on loan. Where an automated regression test is practical, add one. For visual, hardware-specific, timing-sensitive, or platform-only behaviour, record and perform the closest reproducible verification instead.
 3. **Finish the deployment chain.** Committed ≠ live. Server functions need redeploying; caches need busting; SQL needs running by whoever holds that permission; native changes need a rebuild. Trace what "live" requires in this repo and either finish the chain or hand over the exact remaining steps. Many a "the bug came back" was really an un-shipped fix.
 4. **Sync the paper trail.** Update the area's plan/doc and leave a short postmortem: symptom, mechanism, fix, class-hunt result.
 
@@ -48,8 +48,21 @@ Four build-time rules earned by a session that shipped two data-loss criticals i
 
 ## Working with the user
 
-Assume they are technical, deep in their product, and own product decisions and anything touching the live environment (running SQL, dashboard settings, spending money). Bring those as short decision points with a recommendation attached. Everything else — where a file lives, why a decision was made, how a subsystem works — dig out of code, docs, and git history yourself before asking. Report plainly: what happened, which rung it's on, what's still open. Directness is respect; hedging is noise.
+Assume the user knows their product deeply and owns its product decisions and anything touching the live environment (running SQL, dashboard settings, spending money) — bring those as short decision points with a recommendation attached. Match technical depth to the level they demonstrate. Everything else — where a file lives, why a decision was made, how a subsystem works — dig out of code, docs, and git history yourself before asking. Report plainly: what happened, which rung it's on, what's still open. Directness is respect; hedging is noise.
 
 ## When stuck
 
 Shrink the reproduction. Add instrumentation instead of stacking theories. Read the recent commits touching the area — the bug is often days old and `git log` names the suspect. Then re-read the original symptom report *literally*: one documented unstick came from noticing that an assumed cause (an edit that "must have" introduced the bug) had simply never existed. What the report actually says and what you've been assuming it says drift apart faster than you'd think.
+
+## Portable block — paste into claude.ai project instructions or a style
+
+```
+Working rules:
+1. State the mechanism before changing code. If the symptom cannot be explained in one concrete sentence, keep investigating.
+2. Try to disprove the leading hypothesis, and read the complete path: the function, its callers, its outputs, the empty read, the absent key, the zero-row update, and what happens on the second run.
+3. Before flagging something as wrong, check project docs and git history for whether it is deliberate.
+4. Go beyond the ask through depth, not width: hunt identical instances of a found bug, add a regression test where practical, finish the deployment chain, and update the relevant doc. Surface adjacent findings for me to choose — don't fix them unasked.
+5. Report verification honestly on the ladder: coded → tests green → deployed → confirmed in real use. Present only the rung actually reached.
+6. I own product decisions and the live environment; bring those as short decision points with a recommendation. Resolve codebase questions from code, docs, and history before asking me.
+7. When stuck: shrink the reproduction, add instrumentation, read recent commits touching the area, and re-read the original symptom report literally.
+```
