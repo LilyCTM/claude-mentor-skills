@@ -17,6 +17,8 @@ Assume the cost asymmetry is extreme: an extra hour of reading code is cheap; lo
 
 **Try to disprove your own hypothesis.** Ask: what else would produce exactly this evidence? A generated report kept flipping a numeric range — looked exactly like the model doing unit conversion. Except both units were already pre-printed server-side, so conversion *couldn't* be the mechanism; the real cause was the model parroting a nearby in-prompt example. Matching a known failure pattern is a hypothesis, not a diagnosis: it tells you where to look first, not what you'll find.
 
+**Check the fix against the class, not the instance you caught.** A database hardening pass found service-role-only functions executable by client roles: their owning files had revoked `FROM PUBLIC`, but the platform's default privileges had granted the client roles directly — a revoke removes only the grantees it names. The remediation fixed those correctly, and in the same file "hardened" nine more functions with a revoke naming only one client role — leaving them executable through the creation-time PUBLIC grant. The fix for "a revoke that names fewer grantees than the live ACL holds" was itself such a revoke: immune to the caught instance, guilty of the class. Two defences, both mandatory: after diagnosing, restate the bug at mechanism level and apply that sentence to your own fix's statements; and verify the end state with a query that computes the effective result (in Postgres, `has_function_privilege`), never by confirming the fix statements executed. Additive config systems — ACLs, firewall rules, CSS specificity, inheritance chains — always offer multiple independent paths to the same effect; removing one path proves nothing about reachability.
+
 **Read the whole path, not the hunk.** Bugs live at boundaries — caller/callee contract drift, the empty/absent/zero-row case, what the code does the *second* time it runs. Before changing a function, read it whole, read its callers, and follow its output to where it's consumed. Hunk-level reading produces hunk-level fixes.
 
 **Quote errors exactly.** A paraphrased error loses the load-bearing word. Grep the codebase for the literal string — it usually lands you at the throw site in one hop.
@@ -58,7 +60,7 @@ Shrink the reproduction. Add instrumentation instead of stacking theories. Read 
 
 ```
 Working rules:
-1. State the mechanism before changing code. If the symptom cannot be explained in one concrete sentence, keep investigating.
+1. State the mechanism before changing code. If the symptom cannot be explained in one concrete sentence, keep investigating — and before shipping, check the fix itself against that mechanism sentence: remediations are frequent members of the class they fix. Verify end state by querying the effective result, not by confirming the fix statements ran.
 2. Try to disprove the leading hypothesis, and read the complete path: the function, its callers, its outputs, the empty read, the absent key, the zero-row update, and what happens on the second run.
 3. Before flagging something as wrong, check project docs and git history for whether it is deliberate.
 4. Go beyond the ask through depth, not width: hunt identical instances of a found bug, add a regression test where practical, finish the deployment chain, and update the relevant doc. Surface adjacent findings for me to choose — don't fix them unasked.
