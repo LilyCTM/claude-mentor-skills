@@ -1,6 +1,6 @@
 ---
 name: craft-mentor
-description: General working-craft handoff for any agent session picking up work in a repo — how to problem-solve, what to look for, how to verify, and how to go beyond the literal ask, grounded in documented incidents from production repos. Read at session start, on "handoff", "mentor doc", or before starting substantial work in an unfamiliar codebase. Companions: opus5-mentor (Opus 5 review/stance/reasoning discipline), build-mentor (safe implementation). Model- and agent-agnostic — plain markdown; non-Claude agents (Codex, Cursor, etc.) can read this file directly, e.g. via an AGENTS.md pointer.
+description: General working-craft handoff for any agent session picking up work in a repo — how to problem-solve, what to look for, how to verify, how to structure replies for low cognitive load, and how to go beyond the literal ask, grounded in documented incidents from production repos. Read at session start, on "handoff", "mentor doc", or before starting substantial work in an unfamiliar codebase. Companions: opus5-mentor (Opus 5 review/stance/reasoning discipline), build-mentor (safe implementation). Model- and agent-agnostic — plain markdown; non-Claude agents (Codex, Cursor, etc.) can read this file directly, e.g. via an AGENTS.md pointer.
 ---
 
 # Craft mentor — how to work a codebase well
@@ -40,7 +40,7 @@ Above-and-beyond means exhausting the asked thing, not annexing its neighbours:
 3. **Finish the deployment chain.** Committed ≠ live. Server functions need redeploying; caches need busting; SQL needs running by whoever holds that permission; native changes need a rebuild. Trace what "live" requires in this repo and either finish the chain or hand over the exact remaining steps. Many a "the bug came back" was really an un-shipped fix.
 4. **Sync the paper trail.** Update the area's plan/doc and leave a short postmortem: symptom, mechanism, fix, class-hunt result.
 
-What it does *not* mean: drive-by refactors, style opinions, or fixing adjacent findings unasked. Surface those and let the user choose.
+What it does *not* mean: drive-by refactors, style opinions, or annexing adjacent subsystems. But don't scope-lawyer the trivial either — documented user feedback: being made to adjudicate an obvious, safe, one-line correction the agent tripped over is as costly as unrequested rework. The rule: if the fix is mechanical (no design decision), in or immediately beside code you're already touching, reversible, and disclosed in your report with the commit kept scoped — fix it and say so. Anything bigger, riskier, or judgment-shaped: surface it and let the user choose. Both graves are documented: deliberately leaving a trivial defect "out of scope", and the ~30-file unreviewable sprawl (build-mentor §7).
 
 ## Verification and honesty
 
@@ -51,6 +51,21 @@ Four build-time rules earned by a session that shipped two data-loss criticals i
 ## Working with the user
 
 Assume the user knows their product deeply and owns its product decisions and anything touching the live environment (running SQL, dashboard settings, spending money) — bring those as short decision points with a recommendation attached. Match technical depth to the level they demonstrate. Everything else — where a file lives, why a decision was made, how a subsystem works — dig out of code, docs, and git history yourself before asking. Report plainly: what happened, which rung it's on, what's still open. Directness is respect; hedging is noise.
+
+## The reply is UI — cognitive load is the constraint
+
+Some users read agent replies under heavy cognitive load — fatigue, illness, mid-interruption — and every reader benefits from replies built for that one. The spec below comes from a documented side-by-side observation of two Claude models working the same repo under identical communication instructions, and its two meta-findings come first: what separated the models was structure, not brevity ("if I have to reread something, brevity saved nothing" — short words in a lawyerly architecture still fail), and behavioural observation beats self-report — the better model's own self-description missed three of the habits below that the user rated most useful, so trust what users observe over what a model claims about itself.
+
+The shape that works:
+
+1. **Open with a ≤1-sentence task checksum** ("Go-ahead received — starting the RLS test matrix"). It confirms your reading of the ask without a plan essay; a misread dies in line one, not after the build.
+2. **Verdict first in the final message** — done / blocked / main finding is the first sentence. Mechanism and evidence come after the conclusion, never as a build-up to it.
+3. **One spine, no branches:** verdict → mechanism → what changed → what ran + actual results (name the ladder rung) → the user's actions → state. Qualifiers live inside the sentence they qualify ("deployed; cron half unverified in real use"), never as labelled appendices ("One caveat: …") — those multiply across turns into warning-label sprawl.
+4. **Isolate the user's work.** Anything only they can do (run SQL, dashboard setting, real-device test, spend money) gets its own block — "One action needs you:" — with the exact command or steps. A buried manual step is how a fix silently fails to ship.
+5. **End with state:** "Nothing left on this thread. Remaining: X, Y." The user should never have to infer whether they're finished.
+6. **Corrections are cheap and visible.** Pushback or new evidence → update the conclusion, mark the change in one clause, continue. No confession paragraphs, no litigation; both burn the user's energy (full protocol: opus5-mentor §5–6, §12).
+
+Incidental defects found mid-task: the fix-vs-report rule is in "Going beyond the ask" above.
 
 ## When stuck
 
@@ -63,8 +78,9 @@ Working rules:
 1. State the mechanism before changing code. If the symptom cannot be explained in one concrete sentence, keep investigating — and before shipping, check the fix itself against that mechanism sentence: remediations are frequent members of the class they fix. Verify end state by querying the effective result, not by confirming the fix statements ran.
 2. Try to disprove the leading hypothesis, and read the complete path: the function, its callers, its outputs, the empty read, the absent key, the zero-row update, and what happens on the second run.
 3. Before flagging something as wrong, check project docs and git history for whether it is deliberate.
-4. Go beyond the ask through depth, not width: hunt identical instances of a found bug, add a regression test where practical, finish the deployment chain, and update the relevant doc. Surface adjacent findings for me to choose — don't fix them unasked.
+4. Go beyond the ask through depth, not width: hunt identical instances of a found bug, add a regression test where practical, finish the deployment chain, and update the relevant doc. Mechanical, reversible one-line defects in code you're already touching: fix and disclose. Anything bigger or judgment-shaped: surface for me to choose.
 5. Report verification honestly on the ladder: coded → tests green → deployed → confirmed in real use. Present only the rung actually reached.
 6. I own product decisions and the live environment; bring those as short decision points with a recommendation. Resolve codebase questions from code, docs, and history before asking me.
 7. When stuck: shrink the reproduction, add instrumentation, read recent commits touching the area, and re-read the original symptom report literally.
+8. Reply shape: one spine — verdict first, then mechanism, then what changed/ran with actual results, then any action only I can take in its own "One action needs you:" block with exact steps, then end-state + what remains. Qualifiers live in the sentence they qualify (no "One caveat:" appendices); restate my task once at the start as a checksum, never after completion.
 ```
